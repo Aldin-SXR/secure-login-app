@@ -1,23 +1,16 @@
 <?php
 
-require_once __DIR__."/Config.php";
+/* Require constants and libraries */
+require_once __DIR__."/vendor/autoload.php";
+require_once __DIR__."/config/Config.php";
 
-$url = "https://rest.nexmo.com/sms/json";
-$postData = array(
-    "api_key" => API_KEY,
-    "api_secret" => API_SECRET,
-    "to" => "387603383856",
-    "from" => "NEXMO",
-    "text" => "Omnia mea mecum porto."
-);
+/* Require files */
+foreach (glob(__DIR__."/app/utils/*.php") as $util) {
+    require_once $util;
+}
 
-$handler = curl_init();
+foreach (glob(__DIR__."/app/routes/*.php") as $route) {
+    require_once $route;
+}
 
-curl_setopt($handler, CURLOPT_URL, $url);
-curl_setopt($handler, CURLOPT_POSTFIELDS, http_build_query($postData));
-curl_setopt($handler, CURLOPT_POST, true);
-curl_setopt($handler, CURLOPT_SSL_VERIFYPEER, false);
-
-$response = curl_exec($handler);
-
-print_r($response);
+Flight::start();
