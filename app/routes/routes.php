@@ -60,6 +60,13 @@ Flight::route("POST /login", function() {
     Flight::json([ "message" => "Welcome to the system, ".$raw_data["username"] ]);
 });
 
+Flight::route("POST /validate", function() {
+    $otp = OTPGenerator::generate_otp();
+    $text = 'Your one-time password is: '.$otp."\n".'It will expire in 30 seconds.'."\n";
+    $response = SendSms::send_message($text);
+    Flight::json($response);
+});
+
 
 Flight::route("GET /", function() {
     $base_url = "";

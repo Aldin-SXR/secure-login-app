@@ -3,14 +3,14 @@
 require_once __DIR__."/../../config/Config.php";
 
 class SendSms {
-    public static function send_message() {
+    public static function send_message($text, $to = '387603383856', $from = 'SSSD') {
         $url = "https://rest.nexmo.com/sms/json";
         $postData = array(
             "api_key" => API_KEY,
             "api_secret" => API_SECRET,
-            "to" => "387603383856",
-            "from" => "NEXMO",
-            "text" => "Omnia mea mecum porto."
+            "to" => $to,
+            "from" => $from,
+            "text" => $text
         );
         
         $handler = curl_init();
@@ -21,7 +21,7 @@ class SendSms {
         curl_setopt($handler, CURLOPT_SSL_VERIFYPEER, false);
         
         $response = curl_exec($handler);
-        
-        print_r($response);
+
+        return json_decode($response, true);
     }
 }
