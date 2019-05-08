@@ -56,9 +56,14 @@ Flight::route("POST /register", function() {
  * )
  */
 Flight::route("POST /login", function() {
-    $raw_data = Flight::request()->data->getData();
-    Flight::json([ "message" => "Welcome to the system, ".$raw_data["username"] ]);
+    $data = Flight::request()->data->getData();
+    if (array_key_exists('captcha_response', $data)) {
+        $response = ReCaptcha::validate($data['captcha_response']);
+        Flight::json([ "response" => $response ]);
+    }
+    // Flight::json([ "message" => "Welcome to the system, ".$raw_data["username"] ]);
 });
+
 
 Flight::route("POST /validate", function() {
     $otp = OTPGenerator::generate_otp();

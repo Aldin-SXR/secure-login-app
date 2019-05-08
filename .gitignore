@@ -1,5 +1,7 @@
 .vscode/
 .idea/
-vendor/
+api/vendor/
+public/node_modules/
 composer.lock
-Config.php
+api/config/Config.php
+public/config.js

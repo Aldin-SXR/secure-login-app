@@ -14,7 +14,7 @@ class LoginModel {
      *
      * @var string
      */
-    private $username;
+    public $username;
     /**
      * @OA\Property(
      *     description="Password",
@@ -23,5 +23,14 @@ class LoginModel {
      *
      * @var string
      */
-    private $password;
+    public $password;
+    /**
+     * @OA\Property(
+     *     description="Google ReCaptcha response",
+     *     title="Captcha response",
+     * )
+     *
+     * @var string
+     */
+    public $captcha_response;
 }
