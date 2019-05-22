@@ -1,0 +1,35 @@
+<div class="ui middle aligned center aligned grid" ng-controller="loginController" style="margin-top: 5em;">
+    <div class="column">
+        <h2 class="ui red image header">
+            <img src="img/favicon.png" class="image">
+            <div class="content">
+                Log in to your account
+            </div>
+        </h2>
+        <form class="ui large form" ng-submit="logIn()">
+            <div class="ui stacked segment">
+                <div class="field">
+                    <div class="ui left icon input">
+                        <i class="user icon"></i>
+                        <input type="text" name="credentials" placeholder="E-mail address / Username" ng-model="credentials">
+                    </div>
+                </div>
+                <div class="field">
+                    <div class="ui left icon input">
+                        <i class="lock icon"></i>
+                        <input type="password" name="password" placeholder="Password" ng-model="password">
+                    </div>
+                </div>
+                <!-- ReCaptcha -->
+                <div ng-if="loginCount >= 5" style="margin-left: 3em; margin-bottom: 1em;" vc-recaptcha
+                    on-success="setCaptchaResponse(response)" key="'6LeMY6IUAAAAAC-Ccy5WQccJFpx7WPZWcvn5rrcK'"></div>
+                <div class="ui fluid large red submit button" ng-click="logIn()"
+                    ng-class="{'loading': loading, 'disabled': loading}">LOG IN</div>
+            </div>
+            <div class="ui error message"></div>
+        </form>
+        <div class="ui message">
+            Don't have an account? <a href="#!register">Sign Up</a>
+        </div>
+    </div>
+</div>

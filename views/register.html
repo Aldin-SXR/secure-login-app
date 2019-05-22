@@ -1,0 +1,58 @@
+<div class="ui middle aligned center aligned grid" ng-controller="registerController" style="margin-top: 5em;">
+    <div class="column">
+        <h2 class="ui red image header">
+            <img src="img/favicon.png" class="image">
+            <div class="content">
+                Register for an account
+            </div>
+        </h2>
+        <form class="ui large form" ng-submit="logIn()">
+            <div class="ui stacked segment">
+                <div class="field">
+                    <div class="ui left icon input">
+                        <i class="user icon"></i>
+                        <input type="text" name="name" placeholder="Name and surname" ng-model="name">
+                    </div>
+                </div>
+                <div class="field">
+                    <div class="ui left icon input">
+                        <i class="user outline icon"></i>
+                        <input type="text" name="user_name" placeholder="Username" ng-model="user_name">
+                    </div>
+                </div>
+                <div class="field">
+                    <div class="ui left icon input">
+                        <i class="envelope icon"></i>
+                        <input type="email" name="email_address" placeholder="E-mail address" ng-model="email_address">
+                    </div>
+                </div>
+                <div class="field">
+                    <div class="ui left icon input">
+                        <i class="phone icon"></i>
+                        <input type="tel" name="phone_number" placeholder="Phone number" ng-model="phone_number">
+                    </div>
+                </div>
+                <div class="ui divider"></div>
+                <div class="field">
+                    <div class="ui left icon input">
+                        <i class="lock icon"></i>
+                        <input type="password" name="password" placeholder="Password" ng-model="password">
+                    </div>
+                </div>
+                <div class="field">
+                    <div class="ui left icon input">
+                        <i class="lock icon"></i>
+                        <input type="password" name="rePassword" placeholder="Re-type password" ng-model="rePassword">
+                        <!-- <div class="ui button"><i class="eye icon"></i></div> -->
+                    </div>
+                </div>
+                <div class="ui fluid large red submit button" ng-click="logIn()"
+                    ng-class="{'loading': loading, 'disabled': loading}">REGISTER</div>
+            </div>
+            <div class="ui error message"></div>
+        </form>
+        <div class="ui message">
+            Already have an account? <a href="#!login">Log In</a>
+        </div>
+    </div>
+</div>
