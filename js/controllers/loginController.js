@@ -1,6 +1,6 @@
 const loginController = ($scope, $http, toast) => {
     $scope.loginCount = 0;
-    $scope.emailAddress = "";
+    $scope.credentials = "";
     $scope.password = "";
     $scope.reCaptcha = "";
     $scope.loading = false;
@@ -12,18 +12,24 @@ const loginController = ($scope, $http, toast) => {
 
     $scope.logIn = () => {
         /* Check for filled fields */
-        if (!isEmpty($scope.emailAddress) && !isEmpty($scope.password)) {
+        if (!isEmpty($scope.credentials) && !isEmpty($scope.password)) {
             return;    
         }
+        let credentials = {
+            username: $scope.credentials,
+            password: $scope.password
+        };
         /* Handle captcha */
-        let captcha = { };
         if ($scope.loginCount >= 5) {
-            captcha.captcha_response = $scope.reCaptcha;
+            credentials.captcha_response = $scope.reCaptcha;
         }
         /* Handle API endpoint call */
         $scope.loading = true;
-        $http.post(API_URL + "/login", captcha).then(response => {
-            console.log(response);
+        $http.post(API_URL + "/login", credentials).then(response => {
+            toast({
+                className: 'alert-success',
+                message: response.data.message
+            });
         }, error => {
             /* Increase login attempts on incorrect login */
             toast({

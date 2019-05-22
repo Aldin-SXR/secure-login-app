@@ -12,4 +12,11 @@ class UserDao extends BaseDao {
         $user = $stmt->fetch();
         return $user;
     }
+
+    public function insert_user($user) {
+        $stmt = $this->pdo->prepare('INSERT INTO users(name, user_name, email_address, phone_numer, password)
+            VALUES (:name, :user_name, :email_address, :phone_number, :password);');
+        $stmt->execute($user);
+        return $this->pdo->lastInsertId();
+    }
 }
