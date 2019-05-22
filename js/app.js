@@ -11,9 +11,12 @@ app.config(function ($routeProvider) {
         })
         .when("/register", {
             templateUrl: "views/register.html"
+        }).when("/home", {
+            templateUrl: "views/home.html"
         });
 });
 
 /** Controllers */
 app.controller("loginController", loginController);
 app.controller("registerController", registerController);
+app.controller("homeController", homeController);

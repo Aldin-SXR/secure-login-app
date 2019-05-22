@@ -2,6 +2,19 @@ const isEmpty = (field) => {
     return field && field !== "" && field !== null && field !== [];
 }
 
+const tokenIsValid = (token) => {
+    if (token) {
+        try {
+            let decoded = jwt_decode(token);
+            let currentTime = Date.now() / 1000;
+            return decoded.exp < currentTime ? false : true;
+        } catch (e) {
+            return false;
+        }
+    }
+    return false;
+}
+
 /** jQuery. */
 $(document).ready(function (e) {
     $('.ui.form')

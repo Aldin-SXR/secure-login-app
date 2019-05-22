@@ -64,15 +64,54 @@ Flight::route("POST /login", function() {
         $response = ReCaptcha::validate($data['captcha_response']);
         Flight::json([ "response" => $response ]);
     }
-    // Flight::json([ "message" => "Welcome to the system, ".$raw_data["username"] ]);
 });
 
+/**
+ * @OA\Post(
+ *     path="/sms",
+ *     tags={"auth"},
+ *     summary="Send and SMS code.",
+ *     description="Send a 6-digit authentication code via SMS.",
+ *     operationId="sms",
+ *     @OA\Response(
+ *         response=200,
+ *         description="Successful SMS sending."
+ *     ),
+ *     @OA\RequestBody(
+ *         description="SMS code model",
+ *         required=true,
+ *         @OA\JsonContent(ref="#/components/schemas/SMSCodeModel")
+ *     )
+ * )
+ */
+Flight::route("POST /sms", function() {
+    $user_service = new UserService();
+    $data  = Flight::request()->data->getData();
+    $user_service->send_sms_code($data);
+});
 
-Flight::route("POST /validate", function() {
-    $otp = OTPGenerator::generate_otp();
-    $text = 'Your one-time password is: '.$otp."\n".'It will expire in 30 seconds.'."\n";
-    $response = SendSms::send_message($text);
-    Flight::json($response);
+/**
+ * @OA\Post(
+ *     path="/verify",
+ *     tags={"auth"},
+ *     summary="Verify login attempt.",
+ *     description="Verify an attempted login by using an OTP, or SMS-generated code.",
+ *     operationId="verify",
+ *     @OA\Response(
+ *         response=200,
+ *         description="Successful verification and login."
+ *     ),
+ *     @OA\RequestBody(
+ *         description="Verification model",
+ *         required=true,
+ *         @OA\JsonContent(ref="#/components/schemas/VerificationModel")
+ *     )
+ * )
+ */
+Flight::route("POST /verify", function() {
+    $user_service = new UserService();
+    $data  = Flight::request()->data->getData();
+    $user_service->verify_authentication($data);
 });
 
 

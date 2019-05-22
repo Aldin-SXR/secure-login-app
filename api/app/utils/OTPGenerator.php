@@ -7,26 +7,21 @@ use ParagonIE\ConstantTime\Base32;
  */
 
 class OTPGenerator {
-    private static $otp;
+    /** @var TOTP OTP object. */
+    private $otp;
 
-    public static function generate_otp() {
-        self::$otp = TOTP::create();
-        self::$otp->setLabel('aldin@tribeos.io');
-        $secret = Base32::encode(self::random_str(16));
-        return self::$otp->now($secret);
+    public function __construct($secret, $email) {
+        $secret = Base32::encode($secret);
+        $this->otp = TOTP::create($secret);
+        $this->otp->setLabel($email);
     }
 
-    public static function get_provisioning_link() {
-        return self::$otp->getProvisioningUri();
-    }
+    public function get_otp() {
+        return $this->otp->now();
+    } 
 
-    private static function random_str($length, $keyspace = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ') {
-        $pieces = [];
-        $max = mb_strlen($keyspace, '8bit') - 1;
-        for ($i = 0; $i < $length; ++$i) {
-            $pieces []= $keyspace[random_int(0, $max)];
-        }
-        return implode('', $pieces);
+    public function get_provisioning_link() {
+        return $this->otp->getProvisioningUri();
     }
 
     public static function get_qr_code($provisioning_link) {
