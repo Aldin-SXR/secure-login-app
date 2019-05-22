@@ -1,5 +1,4 @@
 <?php
-require_once __DIR__."/../../config/Config.php";
 
 class PasswordChecker {
     /* Send a GET request via CURL */

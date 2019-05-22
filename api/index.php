@@ -2,11 +2,19 @@
 
 /* Require constants and libraries */
 require_once __DIR__."/vendor/autoload.php";
-require_once __DIR__."/config/Config.php";
+require_once __DIR__."/config/config.php";
 
 /* Require files */
 foreach (glob(__DIR__."/app/utils/*.php") as $util) {
     require_once $util;
+}
+
+foreach (glob(__DIR__."/app/db/*.php") as $dao) {
+    require_once $dao;
+}
+
+foreach (glob(__DIR__."/app/services/*.php") as $service) {
+    require_once $service;
 }
 
 foreach (glob(__DIR__."/app/routes/*.php") as $route) {
@@ -26,6 +34,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     header('HTTP/1.0 200');
     die();
 }
-
 
 Flight::start();

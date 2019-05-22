@@ -1,7 +1,5 @@
 <?php
 
-require_once __DIR__."/../../config/Config.php";
-
 class SendSms {
     public static function send_message($text, $to = '387603383856', $from = 'SSSD') {
         $url = "https://rest.nexmo.com/sms/json";

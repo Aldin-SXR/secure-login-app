@@ -56,7 +56,10 @@ Flight::route("POST /register", function() {
  * )
  */
 Flight::route("POST /login", function() {
+    $user_service = new UserService();
     $data = Flight::request()->data->getData();
+    $user_service->log_in($data);
+
     if (array_key_exists('captcha_response', $data)) {
         $response = ReCaptcha::validate($data['captcha_response']);
         Flight::json([ "response" => $response ]);
