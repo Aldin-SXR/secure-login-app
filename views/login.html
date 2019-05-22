@@ -48,7 +48,7 @@
                 <div ng-if="loginData && authMethod === 'otp'" class="field">
                     <!-- Enter verification code -->
                     <div class="ui input">
-                        <input type="text" name="authCode" placeholder="Enter verification code"
+                        <input type="text" name="authCode" placeholder="Enter Google OTP code"
                             ng-model="$parent.authCode">
                     </div>
                     <div class="ui fluid large red submit button" ng-click="verify()" style="margin-top: 1em;"

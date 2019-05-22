@@ -1,6 +1,6 @@
 .vscode/
 .idea/
-api/vendor/
+vendor/
 public/node_modules/
 composer.lock
 api/config/config.php

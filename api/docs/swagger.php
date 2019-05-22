@@ -9,7 +9,7 @@ ini_set('display_errors', 0);
 $arr = explode("/", $_GET['send']);
 if ($arr[0] == 'swagger.json') {
 
-    require (SERVER_ROOT . "/../vendor/autoload.php");
+    require (SERVER_ROOT . "/../../vendor/autoload.php");
     $openapi = \OpenApi\scan([
         SERVER_ROOT . "/../app/models",
         SERVER_ROOT . "/../app/routes",
