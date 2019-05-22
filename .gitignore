@@ -2,7 +2,6 @@
 .idea/
 vendor/
 public/node_modules/
-composer.lock
 api/config/config.php
 api/test.php
 public/config.js
