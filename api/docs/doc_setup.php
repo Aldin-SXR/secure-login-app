@@ -2,12 +2,12 @@
 
 /**
  * @OA\Info(
- *   title="Sample project API",
- *   description="Student lab project",
+ *   title="SSSD Project",
+ *   description="SSSD secure login/registration project.",
  *   version="a 0.1",
  *   @OA\Contact(
- *     email="adnan@tribeos.io",
- *     name="Adnan"
+ *     email="aldin@tribeos.io",
+ *     name="Aldin Kovačević"
  *   )
  * )
  * @OA\OpenApi(

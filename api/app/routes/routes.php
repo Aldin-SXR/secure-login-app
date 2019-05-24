@@ -107,8 +107,10 @@ Flight::route("POST /verify", function() {
 
 Flight::route("GET /", function() {
     $base_url = "";
-    if ((empty($_SERVER['HTTPS']) || $_SERVER['HTTPS'] == "off") && defined('ENV') && ENV == 'PROD') {
-        $base_url = "https://" . $_SERVER['HTTP_HOST'] . "/";
+    if ($_ENV['HEROKU_APP']) {
+        $base_url = "https://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+    } else if ((empty($_SERVER['HTTPS']) || $_SERVER['HTTPS'] == "off") && defined('ENV') && ($_ENV['HEROKU_APP'])) {
+        $base_url = "https://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
     } else {
         $base_url = $_SERVER['REQUEST_SCHEME'] . "://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
     }
