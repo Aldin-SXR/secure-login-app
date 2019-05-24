@@ -19,7 +19,7 @@ if ($arr[0] == 'swagger.json') {
 
     $base_url = "";
     if (($_SERVER['HTTPS'] == 'on' || (empty($_SERVER['HTTPS']) || $_SERVER['HTTPS'] == "off")) && $_ENV['HEROKU_APP']) {
-        $base_url = "https://" . $_SERVER['HTTP_HOST'] . "/";
+        $base_url = "https://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
     } else {
         $base_url = $_SERVER['REQUEST_SCHEME'] . "://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
     }
