@@ -14,8 +14,8 @@ class UserDao extends BaseDao {
     }
 
     public function insert_user($user) {
-        $stmt = $this->pdo->prepare('INSERT INTO users(name, user_name, email_address, phone_numer, password)
-            VALUES (:name, :user_name, :email_address, :phone_number, :password);');
+        $stmt = $this->pdo->prepare('INSERT INTO users(name, user_name, email_address, phone_number, password, otp_secret)
+            VALUES (:name, :user_name, :email_address, :phone_number, :password, :otp_secret);');
         $stmt->execute($user);
         return $this->pdo->lastInsertId();
     }
@@ -64,5 +64,15 @@ class UserDao extends BaseDao {
         ]);
         $data = $stmt->fetch();
         return $data;
+    }
+
+    public function get_by_email_address_or_username($email, $username) {
+        $stmt = $this->pdo->prepare('SELECT email_address, user_name FROM users WHERE email_address = :email_address OR user_name = :user_name;');
+        $stmt->execute([
+            'email_address' => $email,
+            'user_name' => $username
+        ]);
+        $user = $stmt->fetchAll();
+        return $user;
     }
 }

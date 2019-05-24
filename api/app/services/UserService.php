@@ -13,15 +13,29 @@ class UserService {
      * Check user upon login.
      */
     public function log_in($data) {
+        /* Log system access */
+        // $sys_access_dao = new SystemAccessDao();
+        // $sys_access_dao->log_access();
+
         $allowed_fields = [ 'username', 'password', 'captcha_response' ];
         $required_fields = [ 'username', 'password' ];
         $parsed_data = Validator::validate_data($data, $allowed_fields, $required_fields);
+        
+        /* Handle captcha response */
+        if (array_key_exists('captcha_response', $parsed_data) && isset($parsed_data['captcha_response'])) {
+            $response = ReCaptcha::validate($parsed_data['captcha_response']);
+            if (!$response['success']) {
+                JsonResponse::error('Incorrect captcha verification.');
+            }
+        }
+
         /* Attempt to fetch a user */
         $user = $this->user_dao->get_user_by_credentials($parsed_data['username']);
         /* Handle non-existing user */
         if (!$user) {
             JsonResponse::error('Provided account credentials are invalid.', 401);
         }
+
         /* Verify password */
         if (!password_verify($parsed_data['password'], $user['password'])) {
             JsonResponse::error('Provided account credentials are invalid.', 401);
@@ -112,5 +126,50 @@ class UserService {
         } else {
             JsonResponse::error('Invalid authentication code provided.', 401);
         }
+    }
+
+    /**
+     * Register a new user.
+     */
+    public function register($data) {
+        $allowed_fields = [ 'name', 'user_name', 'email_address', 'email_address', 'phone_number', 'password' ];
+        $required_fields = $allowed_fields;
+        $parsed_data = Validator::validate_data($data, $allowed_fields, $required_fields);
+
+        /** Field validators */
+        /* Check uniqueness of username and e-mail address */
+        $users = $this->user_dao->get_by_email_address_or_username($parsed_data['email_address'], $parsed_data['user_name']);
+        foreach ($users as $user) {
+            /* Validate unique email */
+            if ($user['email_address'] === $parsed_data['email_address']) {
+                JsonResponse::error('This e-mail address is already taken.');
+            }
+            /* Validate unique username */
+            if ($user['user_name'] === $parsed_data['user_name']) {
+                JsonResponse::error('This username is already taken.');
+            }
+        }
+
+        /* E-mail (valid) */
+        Validator::validate_email($parsed_data['email_address']);
+
+        /* Username (no special characters) */
+        Validator::validate_username($parsed_data['user_name']);
+
+        /* Password (length, complexity, was it breached) */
+        Validator::validate_password($parsed_data['password']);
+        $parsed_data['password'] = password_hash($parsed_data['password'], PASSWORD_DEFAULT);
+
+        /* Set up Google OTP */
+        $secret = Util::random_str(16);
+        $otp = new OTPGenerator($secret, $parsed_data['email_address']);
+        $otp_link = $otp->get_provisioning_link();
+        $parsed_data['otp_secret'] = $secret;
+
+        /** Insert the new account */
+        $this->user_dao->insert_user($parsed_data);
+        JsonResponse::output([
+            'otp_qr' => $otp_link
+        ], 'Successful registration.');
     }
 }

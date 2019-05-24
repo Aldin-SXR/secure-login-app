@@ -8,21 +8,21 @@
         </h2>
         <form class="ui large form" ng-submit="logIn()">
             <div class="ui stacked segment">
-                <div class="field">
+                <div ng-hide="loginData" class="field">
                     <div class="ui left icon input">
                         <i class="user icon"></i>
                         <input type="text" name="credentials" placeholder="E-mail address / Username"
                             ng-model="credentials">
                     </div>
                 </div>
-                <div class="field">
+                <div ng-hide="loginData" class="field">
                     <div class="ui left icon input">
                         <i class="lock icon"></i>
                         <input type="password" name="password" placeholder="Password" ng-model="password">
                     </div>
                 </div>
                 <!-- ReCaptcha -->
-                <div ng-if="loginCount >= 5" style="margin-left: 3em; margin-bottom: 1em;" vc-recaptcha
+                <div ng-if="loginCount >= 5 && !loginData" style="margin-left: 3em; margin-bottom: 1em;" vc-recaptcha
                     on-success="setCaptchaResponse(response)" key="'6LeMY6IUAAAAAC-Ccy5WQccJFpx7WPZWcvn5rrcK'"></div>
                 <div ng-if="loginData" class="grouped fields" style="text-align: left">
                     <label>Select 2-factor authentication method:</label>
@@ -56,7 +56,7 @@
                     </div>
                 </div>
                 <div ng-if="loginData">
-                    <p style="margin-top: 1em; text-align: center; cursor: pointer;" ng-click="backToLogin()"><a>Go back to login</a></p>
+                    <p title="Return to the login from" style="margin-top: 1em; text-align: center; cursor: pointer;" ng-click="backToLogin()"><a>Go back to login</a></p>
                 </div>
                 <div ng-if="!loginData" class="ui fluid large red submit button" ng-click="logIn()"
                     ng-class="{'loading': loading, 'disabled': loading}">LOG IN</div>

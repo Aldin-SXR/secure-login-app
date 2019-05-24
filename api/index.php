@@ -2,7 +2,13 @@
 
 /* Require constants and libraries */
 require_once __DIR__."/../vendor/autoload.php";
-require_once __DIR__."/config/config.php";
+
+/* Heroku vs regular setup */
+if ($_ENV['HEROKU_APP']) {
+    require_once __DIR__."/config/env.php";
+} else {
+    require_once __DIR__."/config/config.php";
+}
 
 /* Require files */
 foreach (glob(__DIR__."/app/utils/*.php") as $util) {

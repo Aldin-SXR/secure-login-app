@@ -27,22 +27,17 @@
  * )
  */
 Flight::route("POST /register", function() {
-    $raw_data = Flight::request()->data->getData();
-    /* Check for password */
-    if (PasswordChecker::password_is_breached($raw_data["password"])) {
-        Flight::json([ "message" => "This password has been breached. Please choose a different password." ], 400);
-        die;
-    }
-    /* Send a welcome response */
-    Flight::json([ "message" => "Successful registration. Welcome, ".$raw_data["name"] ]);
+    $user_service = new UserService();
+    $data = Flight::request()->data->getData();
+    $user_service->register($data);
 });
 
 /**
  * @OA\Post(
  *     path="/login",
  *     tags={"auth"},
- *     summary="Log in",
- *     description="Log in to the system",
+ *     summary="Log in (validate user credentials).",
+ *     description="Validate the user's credentials in the system.",
  *     operationId="login",
  *     @OA\Response(
  *         response=200,
@@ -59,11 +54,6 @@ Flight::route("POST /login", function() {
     $user_service = new UserService();
     $data = Flight::request()->data->getData();
     $user_service->log_in($data);
-
-    if (array_key_exists('captcha_response', $data)) {
-        $response = ReCaptcha::validate($data['captcha_response']);
-        Flight::json([ "response" => $response ]);
-    }
 });
 
 /**

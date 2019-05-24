@@ -6,48 +6,59 @@
                 Register for an account
             </div>
         </h2>
-        <form class="ui large form" ng-submit="logIn()">
+        <form class="ui large form" ng-submit="register()">
             <div class="ui stacked segment">
-                <div class="field">
-                    <div class="ui left icon input">
-                        <i class="user icon"></i>
-                        <input type="text" name="name" placeholder="Name and surname" ng-model="name">
+                <div ng-hide="registerData">
+                    <div class="field">
+                        <div class="ui left icon input">
+                            <i class="user icon"></i>
+                            <input type="text" name="name" placeholder="Name and surname" ng-model="name">
+                        </div>
                     </div>
-                </div>
-                <div class="field">
-                    <div class="ui left icon input">
-                        <i class="user outline icon"></i>
-                        <input type="text" name="user_name" placeholder="Username" ng-model="user_name">
+                    <div class="field">
+                        <div class="ui left icon input">
+                            <i class="user outline icon"></i>
+                            <input type="text" name="user_name" placeholder="Username" ng-model="user_name">
+                        </div>
                     </div>
-                </div>
-                <div class="field">
-                    <div class="ui left icon input">
-                        <i class="envelope icon"></i>
-                        <input type="email" name="email_address" placeholder="E-mail address" ng-model="email_address">
+                    <div class="field">
+                        <div class="ui left icon input">
+                            <i class="envelope icon"></i>
+                            <input type="email" name="email_address" placeholder="E-mail address"
+                                ng-model="email_address">
+                        </div>
                     </div>
-                </div>
-                <div class="field">
-                    <div class="ui left icon input">
-                        <i class="phone icon"></i>
-                        <input type="tel" name="phone_number" placeholder="Phone number" ng-model="phone_number">
+                    <div class="field">
+                        <div class="ui left icon input">
+                            <i class="phone icon"></i>
+                            <input type="tel" name="phone_number" placeholder="Phone number" ng-model="phone_number">
+                        </div>
                     </div>
-                </div>
-                <div class="ui divider"></div>
-                <div class="field">
-                    <div class="ui left icon input">
-                        <i class="lock icon"></i>
-                        <input type="password" name="password" placeholder="Password" ng-model="password">
+                    <div class="ui divider"></div>
+                    <div class="field">
+                        <div class="ui left icon input">
+                            <i class="lock icon"></i>
+                            <input type="password" name="password" placeholder="Password" ng-model="password">
+                        </div>
                     </div>
-                </div>
-                <div class="field">
-                    <div class="ui left icon input">
-                        <i class="lock icon"></i>
-                        <input type="password" name="rePassword" placeholder="Re-type password" ng-model="rePassword">
-                        <!-- <div class="ui button"><i class="eye icon"></i></div> -->
+                    <div class="field">
+                        <div class="ui left icon input">
+                            <i class="lock icon"></i>
+                            <input type="password" name="rePassword" placeholder="Re-type password"
+                                ng-model="rePassword">
+                            <!-- <div class="ui button"><i class="eye icon"></i></div> -->
+                        </div>
                     </div>
+                    <div class="ui fluid large red submit button" ng-click="register()"
+                        ng-class="{'loading': loading, 'disabled': loading}">REGISTER</div>
                 </div>
-                <div class="ui fluid large red submit button" ng-click="logIn()"
-                    ng-class="{'loading': loading, 'disabled': loading}">REGISTER</div>
+                <div ng-if="registerData">
+                    <img src="https://chart.googleapis.com/chart?cht=qr&chl={{$parent.registerData.otp_qr}}&chs=160x160&chld=L|0">
+                    <p>Scan this QR code with your Google Authenticator.</p>
+                    <div class="ui fluid large red submit button" ng-click="goToLogin()"
+                        ng-class="{'loading': loading, 'disabled': loading}">GO TO LOGIN</div>
+                    <p title="Return to the registration from" style="margin-top: 1em; text-align: center; cursor: pointer;" ng-click="backToRegistration()"><a>Go back to registration</a></p>
+                </div>
             </div>
             <div class="ui error message"></div>
         </form>

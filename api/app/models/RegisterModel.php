@@ -8,13 +8,22 @@
 class RegisterModel {
     /**
      * @OA\Property(
+     *     description="Name and surname",
+     *     title="Name",
+     * )
+     *
+     * @var string
+     */
+    private $name;
+    /**
+     * @OA\Property(
      *     description="Username",
      *     title="Username",
      * )
      *
      * @var string
      */
-    private $username;
+    private $user_name;
     /**
      * @OA\Property(
      *     description="E-mail",
@@ -23,7 +32,16 @@ class RegisterModel {
      *
      * @var string
      */
-    private $email;
+    private $email_address;
+    /**
+     * @OA\Property(
+     *     description="Mobile phone number",
+     *     title="Phone number",
+     * )
+     *
+     * @var string
+     */
+    private $phone_number;
     /**
      * @OA\Property(
      *     description="Password",

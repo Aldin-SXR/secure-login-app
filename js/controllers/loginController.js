@@ -33,7 +33,7 @@ const loginController = ($scope, $http, toast, $location) => {
 
     $scope.logIn = () => {
         /* Check for filled fields */
-        if (!isEmpty($scope.credentials) && !isEmpty($scope.password)) {
+        if (isEmpty($scope.credentials) || isEmpty($scope.password)) {
             toast({
                 className: 'alert-danger',
                 message: '<i class="far fa-times-circle"></i>&nbsp; You did not properly fill in all the fields.'
@@ -47,6 +47,14 @@ const loginController = ($scope, $http, toast, $location) => {
         /* Handle captcha */
         if ($scope.loginCount >= 5) {
             credentials.captcha_response = $scope.reCaptcha;
+            /* Prevent login on empty captcha */
+            if (!isNotEmpty($scope.reCaptcha)) {
+                toast({
+                    className: 'alert-danger',
+                    message: '<i class="far fa-times-circle"></i>&nbsp; You did not complete the captcha.'
+                });
+                return;    
+            }
         }
         /* Handle API endpoint call */
         $scope.loading = true;

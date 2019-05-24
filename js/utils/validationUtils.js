@@ -1,5 +1,5 @@
 const isEmpty = (field) => {
-    return field && field !== "" && field !== null && field !== [];
+    return field === "" || field === null || field === [];
 }
 
 const tokenIsValid = (token) => {
