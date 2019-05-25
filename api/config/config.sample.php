@@ -3,8 +3,15 @@
 define("API_KEY", "");
 define("API_SECRET", "");
 define("HIBP_URL", "https://api.pwnedpasswords.com/range/");
+define('SITE_KEY', '');
 define('CAPTCHA_SECRET', '');
 define('JWT_SECRET', '');
+
+/** Durations config */
+define('JWT_EXPIRY', '+60 minutes');
+define('LOGIN_EXPIRY', '+45 seconds');
+define('SMS_EXPIRY', '+30 seconds');
+define('REMEMBER_ME_EXPIRY', '+2 minutes');
 
 /** Database config */
 define('DB_HOST', '');

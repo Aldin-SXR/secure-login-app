@@ -12,4 +12,13 @@ class Util {
         }
         return implode('', $pieces);
     }
+
+    public static function get_ip_address() {
+        return isset($_SERVER['REMOTE_HOST']) ? $_SERVER['REMOTE_HOST'] : 
+                    isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : 'unknown';
+    }
+
+    public static function get_user_agent() {
+        return  isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : 'unknown';
+    }
 }

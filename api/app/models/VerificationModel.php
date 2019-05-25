@@ -19,6 +19,7 @@ class VerificationModel {
      * @OA\Property(
      *     description="Authenticaiton type (SMS or OTP)",
      *     title="Authenticaiton type",
+     *     required=true
      * )
      *
      * @var string
@@ -28,9 +29,20 @@ class VerificationModel {
      * @OA\Property(
      *     description="Authentication code (6-digit number)",
      *     title="Authentication code",
+     *     required=true
      * )
      *
      * @var string
      */
     public $auth_code;
+    /**
+     * @OA\Property(
+     *     description="Remember this account's login (bypass authorization) for some time",
+     *     title="Remember me",
+     *     default=false
+     * )
+     *
+     * @var boolean
+     */
+    public $remember_me;
 }

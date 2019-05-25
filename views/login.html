@@ -23,7 +23,9 @@
                 </div>
                 <!-- ReCaptcha -->
                 <div ng-if="loginCount >= 5 && !loginData" style="margin-left: 3em; margin-bottom: 1em;" vc-recaptcha
-                    on-success="setCaptchaResponse(response)" key="'6LeMY6IUAAAAAC-Ccy5WQccJFpx7WPZWcvn5rrcK'"></div>
+                    on-success="setCaptchaResponse(response)" 
+                    on-create="onCaptchaCreate(captchaId)"
+                    key="'6LeMY6IUAAAAAC-Ccy5WQccJFpx7WPZWcvn5rrcK'"></div>
                 <div ng-if="loginData" class="grouped fields" style="text-align: left">
                     <label>Select 2-factor authentication method:</label>
                     <div id="auth-methods" ng-repeat="option in options" key="{{ option.value }}"
@@ -31,8 +33,9 @@
                         <input type="radio" name="auth-methods" value="{{ option.value }}" ng-model="authMethod">&nbsp;
                         {{ option.name }}<br>
                     </div>
-                    <div ng-if="authMethod === 'sms' && !authSent" class="ui fluid large red submit button" ng-click="sendAuthCode()"
-                        style="margin-top: 1em;" ng-class="{'loading': loading, 'disabled': loading}">SEND VERIFICATION
+                    <div ng-if="authMethod === 'sms' && !authSent" class="ui fluid large red submit button"
+                        ng-click="sendAuthCode()" style="margin-top: 1em;"
+                        ng-class="{'loading': loading, 'disabled': loading}">SEND VERIFICATION
                         CODE</div>
                     <div ng-if="loginData && authSent && authMethod === 'sms'" class="field">
                         <!-- Enter verification code -->
@@ -56,7 +59,12 @@
                     </div>
                 </div>
                 <div ng-if="loginData">
-                    <p title="Return to the login from" style="margin-top: 1em; text-align: center; cursor: pointer;" ng-click="backToLogin()"><a>Go back to login</a></p>
+                    <div class="ui checkbox" ng-click="setRememberMe()">
+                        <input type="checkbox" name="rememberMe" ng-model="$parent.rememberMe">
+                        <label style="cursor: pointer;">Remember me for 24 hours</label>
+                    </div>
+                    <p title="Return to the login from" style="margin-top: 1em; text-align: center; cursor: pointer;"
+                        ng-click="backToLogin()"><a>Go back to login</a></p>
                 </div>
                 <div ng-if="!loginData" class="ui fluid large red submit button" ng-click="logIn()"
                     ng-class="{'loading': loading, 'disabled': loading}">LOG IN</div>

@@ -4,9 +4,12 @@ use Firebase\JWT\JWT;
 class UserService {
     /** @var UserDao User data access object. */
     private $user_dao;
+    /** @var SystemAccessDao System data access object. */
+    private $sys_access_dao;
 
     public function __construct() {
         $this->user_dao = new UserDao();
+        $this->sys_access_dao = new SystemAccessDao();
     }
 
     /**
@@ -14,17 +17,23 @@ class UserService {
      */
     public function log_in($data) {
         /* Log system access */
-        // $sys_access_dao = new SystemAccessDao();
-        // $sys_access_dao->log_access();
+        $this->sys_access_dao->log_access();
 
         $allowed_fields = [ 'username', 'password', 'captcha_response' ];
         $required_fields = [ 'username', 'password' ];
+
+        /* Get the amount of login attempts (and make captcha mandatory, if necessary) */
+        $attempt = $this->sys_access_dao->get_access_attempts();
+        if ($attempt['failed_attempts'] >= 5) {
+            $required_fields[ ] = 'captcha_response';
+        }
         $parsed_data = Validator::validate_data($data, $allowed_fields, $required_fields);
         
         /* Handle captcha response */
         if (array_key_exists('captcha_response', $parsed_data) && isset($parsed_data['captcha_response'])) {
             $response = ReCaptcha::validate($parsed_data['captcha_response']);
             if (!$response['success']) {
+                $this->sys_access_dao->update_access_attempt('failed');
                 JsonResponse::error('Incorrect captcha verification.');
             }
         }
@@ -33,17 +42,24 @@ class UserService {
         $user = $this->user_dao->get_user_by_credentials($parsed_data['username']);
         /* Handle non-existing user */
         if (!$user) {
+            $this->sys_access_dao->update_access_attempt('failed');
             JsonResponse::error('Provided account credentials are invalid.', 401);
         }
 
         /* Verify password */
         if (!password_verify($parsed_data['password'], $user['password'])) {
+            $this->sys_access_dao->update_access_attempt('failed');
             JsonResponse::error('Provided account credentials are invalid.', 401);
+        }
+
+        /* See if 'Remember Me' timestamp has been stored in the database (bypass authorization) */
+        if (strtotime($user['remember_me_until']) > time()) {
+            $this->output_jwt($user);
         }
 
         /* Generate temporary login hash */
         $login_hash = sha1(Util::random_str(16));
-        $expiry = strtotime('+30 seconds');
+        $expiry = strtotime(LOGIN_EXPIRY);
         $this->user_dao->set_login_hash($user['id'], $login_hash, date('Y-m-d H:i:s', $expiry));
         
         $auth = [
@@ -62,7 +78,7 @@ class UserService {
         /* Send an SMS with the authentication code */
         $auth_data = $this->user_dao->get_phone_number($parsed_data['login_hash']);
         $code = Util::random_str(6, '0123456789');
-        $expiry = strtotime('+30 seconds');
+        $expiry = strtotime(SMS_EXPIRY);
         SendSms::send_message(
             'Your one-time authentication code is: '.$code."\n", 
             $auth_data['phone_number'], 'SSSD Login');
@@ -78,8 +94,9 @@ class UserService {
 
     /* Verify authentication method */
     public function verify_authentication($data) {
-        $allowed_fields = [ 'login_hash', 'auth_type', 'auth_code' ];
-        $required_fields = $allowed_fields;
+        // TODO: Shoul OPT fails count towards captcha?
+        $allowed_fields = [ 'login_hash', 'auth_type', 'auth_code', 'remember_me' ];
+        $required_fields = [ 'login_hash', 'auth_type', 'auth_code' ];
         $parsed_data = Validator::validate_data($data, $allowed_fields, $required_fields);
 
         $auth_data = $this->user_dao->get_by_login_hash($parsed_data['login_hash'], $parsed_data['auth_type']);
@@ -110,19 +127,11 @@ class UserService {
 
         /* Send the login JWT */
         if ($parsed_data['auth_code'] == $code) {
-            /* Generate login token */
-            $token = [
-                'data' => [
-                    'id' => $auth_data['id'],
-                    'email_address' => $auth_data['email_address']
-                ],
-                'iat' => time(),
-                'exp' => strtotime('+60 minutes')
-            ];
-
-            JsonResponse::output([
-                'jwt' => JWT::encode($token, JWT_SECRET)
-            ], 'Successfully logged in.');
+            /* See if 'Remember Me' token is set in the request (bypass authorization). */
+            if (isset($parsed_data['remember_me']) && $parsed_data['remember_me']) {
+                $this->user_dao->set_remember_me($auth_data['id'], date('Y-m-d H:i:s', strtotime(REMEMBER_ME_EXPIRY)));
+            }
+            $this->output_jwt($auth_data);
         } else {
             JsonResponse::error('Invalid authentication code provided.', 401);
         }
@@ -171,5 +180,22 @@ class UserService {
         JsonResponse::output([
             'otp_qr' => $otp_link
         ], 'Successful registration.');
+    }
+
+    private function output_jwt($user) {
+        $this->sys_access_dao->update_access_attempt('success');
+        /* Generate login token */
+        $token = [
+            'data' => [
+                'id' => $user['id'],
+                'email_address' => $user['email_address']
+            ],
+            'iat' => time(),
+            'exp' => strtotime(JWT_EXPIRY)
+        ];
+
+        JsonResponse::output([
+            'jwt' => JWT::encode($token, JWT_SECRET)
+        ], 'Successfully logged in.');
     }
 }

@@ -103,11 +103,28 @@ Flight::route("POST /verify", function() {
     $data  = Flight::request()->data->getData();
     $user_service->verify_authentication($data);
 });
-
+ 
+/**
+ * @OA\Get(
+ *     path="/captcha",
+ *     tags={"captcha"},
+ *     summary="Return reCaptcha site key.",
+ *     description="Send the corresponding reCaptcha site key to the client.",
+ *     operationId="captcha",
+ *     @OA\Response(
+ *         response=200,
+ *         description="Site key succesfully sent."
+ *     )
+ * )
+ */
+Flight::route("GET /captcha", function() {
+    $captcha_service = new CaptchaService();
+    $captcha_service->return_site_key();
+});
 
 Flight::route("GET /", function() {
     $base_url = "";
-    if ($_ENV['HEROKU_APP']) {
+    if (isset($_ENV['HEROKU_APP']) && $_ENV['HEROKU_APP']) {
         $base_url = "https://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
     } else if ((empty($_SERVER['HTTPS']) || $_SERVER['HTTPS'] == "off") && defined('ENV') && ($_ENV['HEROKU_APP'])) {
         $base_url = "https://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];

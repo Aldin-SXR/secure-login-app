@@ -10,6 +10,7 @@ class LoginModel {
      * @OA\Property(
      *     description="Username",
      *     title="Username",
+     *     required=true
      * )
      *
      * @var string
@@ -19,6 +20,7 @@ class LoginModel {
      * @OA\Property(
      *     description="Password",
      *     title="Password",
+     *     required=true
      * )
      *
      * @var string

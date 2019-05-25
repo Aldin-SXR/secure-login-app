@@ -10,6 +10,7 @@ class SMSCodeModel {
      * @OA\Property(
      *     description="Login hash, which is valid fo 30 seconds.",
      *     title="Login hash",
+     *     required=true
      * )
      *
      * @var string

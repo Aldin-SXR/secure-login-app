@@ -4,7 +4,8 @@ class UserDao extends BaseDao {
 
     public function get_user_by_credentials($credentials) {
         /* Check whether a username or an email was provided. */
-        $stmt = $this->pdo->prepare('SELECT id, user_name, email_address, password FROM users WHERE user_name = :user_name OR email_address = :email_address;');
+        $stmt = $this->pdo->prepare('SELECT id, user_name, email_address, password, remember_me_until 
+                                                            FROM users WHERE user_name = :user_name OR email_address = :email_address;');
         $stmt->execute([
             'user_name' => $credentials,
             'email_address' => $credentials
@@ -74,5 +75,13 @@ class UserDao extends BaseDao {
         ]);
         $user = $stmt->fetchAll();
         return $user;
+    }
+
+    public function set_remember_me($id, $remember_me_until) {
+        $stmt = $this->pdo->prepare('UPDATE users SET remember_me_until = :remember_me_until WHERE id = :id');
+        $stmt->execute([
+            'id' => $id,
+            'remember_me_until' => $remember_me_until
+        ]);
     }
 }
