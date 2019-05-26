@@ -13,6 +13,10 @@ app.config(function ($routeProvider) {
             templateUrl: "views/register.html"
         }).when("/home", {
             templateUrl: "views/home.html"
+        }).when("/recover", {
+            templateUrl: "views/recover.html"
+        }).when("/recover/:token", {
+            templateUrl: "views/recover.html"
         });
 });
 
@@ -20,3 +24,4 @@ app.config(function ($routeProvider) {
 app.controller("loginController", loginController);
 app.controller("registerController", registerController);
 app.controller("homeController", homeController);
+app.controller("recoverController", recoverController);

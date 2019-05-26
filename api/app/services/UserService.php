@@ -6,10 +6,13 @@ class UserService {
     private $user_dao;
     /** @var SystemAccessDao System data access object. */
     private $sys_access_dao;
+    /** @var RecoveryTokenDao Recovery token data access object. */
+    private $recovery_dao;
 
     public function __construct() {
         $this->user_dao = new UserDao();
         $this->sys_access_dao = new SystemAccessDao();
+        $this->recovery_dao = new RecoveryTokenDao();
     }
 
     /**
@@ -161,10 +164,8 @@ class UserService {
 
         /* E-mail (valid) */
         Validator::validate_email($parsed_data['email_address']);
-
         /* Username (no special characters) */
         Validator::validate_username($parsed_data['user_name']);
-
         /* Password (length, complexity, was it breached) */
         Validator::validate_password($parsed_data['password']);
         $parsed_data['password'] = password_hash($parsed_data['password'], PASSWORD_DEFAULT);
@@ -197,5 +198,77 @@ class UserService {
         JsonResponse::output([
             'jwt' => JWT::encode($token, JWT_SECRET)
         ], 'Successfully logged in.');
+    }
+
+    /**
+     * Password recovery.
+     */
+
+    /* Initiate the recovery procedure */
+    public function initiate_recovery($data) {
+        $allowed_fields = [ 'email_address' ];
+        $required_fields = $allowed_fields;
+        $parsed_data = Validator::validate_data($data, $allowed_fields, $required_fields);
+
+        /* Check if user with the given e-mail address exists */
+        $user = $this->user_dao->get_by_email_address($parsed_data['email_address']);
+        /* Handle non-existing user */
+        if (!$user) {
+            JsonResponse::error('Provided account credentials are invalid.', 401);
+        }
+
+        /* Insert recovery token */
+        $token = sha1(Util::random_str(16).time());
+        $this->recovery_dao->set_recovery_token($user['id'], $token);
+        
+        /* Send recovery token */
+        $mailer = new Mailer();
+        // $mailer->send_recovery_token($user, $token);
+        Util::send_mail('password_recovery', $user, $token);
+
+        JsonResponse::output(NULL, 'Recovery token sent. It will be valid for 5 minutes.');
+    }
+
+    /* Validate the recovery token */
+    public function validate_token($data) {
+        $allowed_fields = [ 'recovery_token' ];
+        $required_fields = $allowed_fields;
+        $parsed_data = Validator::validate_data($data, $allowed_fields, $required_fields); 
+
+        /* Get token data and see if it is valid */
+        $token = $this->recovery_dao->get_token_data($parsed_data['recovery_token']);
+        $this->check_token_validity($token);
+
+        JsonResponse::output(NULL, 'Recovery token is valid.');
+    }
+
+    /* Set new account password */
+    public function reset_password($data) {
+        $allowed_fields = [ 'recovery_token', 'password' ];
+        $required_fields = $allowed_fields;
+        $parsed_data = Validator::validate_data($data, $allowed_fields, $required_fields); 
+
+        /* Get token data and see if it is valid */
+        $token = $this->recovery_dao->get_token_data($parsed_data['recovery_token']);
+        $this->check_token_validity($token);
+
+        /* Check new password validity */
+        Validator::validate_password($parsed_data['password']);
+        $parsed_data['password'] = password_hash($parsed_data['password'], PASSWORD_DEFAULT);
+
+        /* Update the password */
+        $this->user_dao->update_password($token['user_id'], $parsed_data['password']);
+        JsonResponse::output(NULL, 'Password successfully reset.');
+    }
+
+    private function check_token_validity($token) {
+        /* Check for non-existent tokens */
+        if (!$token) {
+            JsonResponse::error('Recovery token is invalid.');
+        }
+        /* Check for expired tokens */
+        if (strtotime($token['expires_at']) < time()) {
+            JsonResponse::error('Recovery token has expired.');
+        }
     }
 }

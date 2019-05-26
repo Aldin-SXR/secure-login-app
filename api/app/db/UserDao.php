@@ -77,11 +77,28 @@ class UserDao extends BaseDao {
         return $user;
     }
 
+    public function get_by_email_address($email) {
+        $stmt = $this->pdo->prepare('SELECT id, email_address, name FROM users WHERE email_address = :email_address;');
+        $stmt->execute([
+            'email_address' => $email
+        ]);
+        $user = $stmt->fetch();
+        return $user;
+    }
+
     public function set_remember_me($id, $remember_me_until) {
         $stmt = $this->pdo->prepare('UPDATE users SET remember_me_until = :remember_me_until WHERE id = :id');
         $stmt->execute([
             'id' => $id,
             'remember_me_until' => $remember_me_until
+        ]);
+    }
+
+    public function update_password($id, $password) {
+        $stmt = $this->pdo->prepare('UPDATE users SET password = :password WHERE id = :id');
+        $stmt->execute([
+            'id' => $id,
+            'password' => $password
         ]);
     }
 }

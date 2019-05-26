@@ -12,6 +12,7 @@ define('JWT_EXPIRY', $_ENV['JWT_EXPIRY']);
 define('LOGIN_EXPIRY', $_ENV['LOGIN_EXPIRY']);
 define('SMS_EXPIRY', $_ENV['SMS_EXPIRY']);
 define('REMEMBER_ME_EXPIRY', $_ENV['REMEMBER_ME_EXPIRY']);
+define('RECOVERY_TOKEN_EXPIRY', $_ENV['RECOVERY_TOKEN_EXPIRY']);
 
 /** Database config */
 define('DB_HOST', $_ENV['DB_HOST']);

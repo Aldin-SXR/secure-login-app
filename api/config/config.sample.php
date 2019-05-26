@@ -12,6 +12,7 @@ define('JWT_EXPIRY', '+60 minutes');
 define('LOGIN_EXPIRY', '+45 seconds');
 define('SMS_EXPIRY', '+30 seconds');
 define('REMEMBER_ME_EXPIRY', '+2 minutes');
+define('RECOVERY_TOKEN_EXPIRY', '+5 minutes');
 
 /** Database config */
 define('DB_HOST', '');

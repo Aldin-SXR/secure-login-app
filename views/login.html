@@ -68,6 +68,9 @@
                 </div>
                 <div ng-if="!loginData" class="ui fluid large red submit button" ng-click="logIn()"
                     ng-class="{'loading': loading, 'disabled': loading}">LOG IN</div>
+                <div ng-hide="loginData" style="margin-top: 1em;">
+                    <a title="Initiate the password recovery process" href="#!recover">Forgot your password?</a>
+                </div>
             </div>
             <div class="ui error message"></div>
         </form>
