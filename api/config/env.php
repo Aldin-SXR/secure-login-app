@@ -20,3 +20,9 @@ define('DB_NAME', $_ENV['DB_NAME']);
 define('DB_USER', $_ENV['DB_USER']);
 define('DB_PASS', $_ENV['DB_PASS']);
 define('DB_CHARSET', $_ENV['DB_CHARSET']);
+
+/** Mail configuration */
+define('SMTP_SERVER', $_ENV['SMTP_SERVER']);
+define('SMTP_PORT', $_ENV['SMTP_PORT']);
+define('SMTP_USER', $_ENV['SMTP_USER']);
+define('SMTP_PASS', $_ENV['SMTP_PASS']);

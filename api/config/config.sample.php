@@ -20,3 +20,9 @@ define('DB_NAME', '');
 define('DB_USER', '');
 define('DB_PASS', '');
 define('DB_CHARSET', 'utf8mb4');
+
+/** Mail configuration */
+define('SMTP_SERVER', '');
+define('SMTP_PORT', 587);
+define('SMTP_USER', '');
+define('SMTP_PASS', '');
