@@ -58,6 +58,16 @@
                         ng-class="{'loading': loading, 'disabled': loading}">VERIFY
                     </div>
                 </div>
+                <div ng-if="loginData && authMethod === 'fido'" class="field">
+                    <!-- Enter verification code -->
+                    <div class="ui input">
+                        <input type="text" name="fido" placeholder="Plug in your hardware key and press it."
+                            ng-model="$parent.authCode">
+                    </div>
+                    <div class="ui fluid large red submit button" ng-click="verify()" style="margin-top: 1em;"
+                        ng-class="{'loading': loading, 'disabled': loading}">VERIFY
+                    </div>
+                </div>
                 <div ng-if="loginData">
                     <div class="ui checkbox" ng-click="setRememberMe()">
                         <input type="checkbox" name="rememberMe" ng-model="$parent.rememberMe">

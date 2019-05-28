@@ -10,7 +10,8 @@ const loginController = ($scope, $http, toast, $location, vcRecaptchaService) =>
     $scope.rememberMe = false;
     $scope.options = [
         { name: 'SMS', value: 'sms' },
-        { name: 'Google OTP', value: 'otp' }
+        { name: 'Google OTP', value: 'otp' },
+        { name: 'Hardware key', value: 'fido' }
     ];
     $scope.authMethod = "sms";
 
@@ -34,6 +35,7 @@ const loginController = ($scope, $http, toast, $location, vcRecaptchaService) =>
     /* Set  authentication method */
     $scope.setAuthenticationMethod = (method)=> {
         $scope.authMethod = method;
+        $scope.authCode = "";
     }
 
     $scope.setRememberMe = () => {

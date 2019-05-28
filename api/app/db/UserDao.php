@@ -22,19 +22,22 @@ class UserDao extends BaseDao {
     }
 
     public function set_login_hash($id, $hash, $expiry) {
-        $stmt = $this->pdo->prepare('UPDATE users SET login_hash = :login_hash, login_hash_expiry = :login_hash_expiry WHERE id = :id');
+        $stmt = $this->pdo->prepare('INSERT INTO login_hashes (login_hash, login_hash_expiry, user_id) 
+            VALUES (:login_hash, :login_hash_expiry, :user_id);');
         $stmt->execute([
-            'id' => $id,
+            'user_id' => $id,
             'login_hash' => $hash,
             'login_hash_expiry' => $expiry
         ]);
     }
 
     public function set_sms_code($id, $code, $expiry) {
-        $stmt = $this->pdo->prepare('UPDATE users SET sms_code = :sms_code, sms_code_expiry = :sms_code_expiry WHERE id = :id');
+        $stmt = $this->pdo->prepare('INSERT INTO validation_codes (sms_code, issued_at, sms_code_expiry, user_id)
+            VALUES (:sms_code, :issued_at, :sms_code_expiry, :user_id);');
         $stmt->execute([
-            'id' => $id,
+            'user_id' => $id,
             'sms_code' => $code,
+            'issued_at' => date('Y-m-d H:i:s'),
             'sms_code_expiry' => $expiry
         ]);
     }
@@ -42,10 +45,20 @@ class UserDao extends BaseDao {
     public function get_by_login_hash($hash, $type) {
         switch ($type) {
             case 'otp':
-                $sql ='SELECT id, email_address, login_hash, login_hash_expiry, otp_secret FROM users WHERE login_hash = :hash;';
+                $sql ='SELECT u.id, u.email_address, lh.login_hash, lh.login_hash_expiry, u.otp_secret FROM users AS u
+                            JOIN login_hashes AS lh ON u.id = lh.user_id
+                            WHERE lh.login_hash = :hash;';
                 break;
             case 'sms':
-                $sql ='SELECT id, email_address, login_hash, login_hash_expiry, sms_code, sms_code_expiry FROM users WHERE login_hash = :hash;';
+                $sql ='SELECT u.id, u.email_address, lh.login_hash, lh.login_hash_expiry, vc.sms_code, vc.sms_code_expiry FROM users AS u
+                            JOIN login_hashes AS lh ON u.id = lh.user_id
+                            JOIN validation_codes AS vc on u.id = vc.user_id
+                            WHERE lh.login_hash = :hash;';
+                break;
+            case 'fido':
+                $sql ='SELECT u.id, u.email_address, lh.login_hash, lh.login_hash_expiry, u.yubiko_id FROM users AS u 
+                            JOIN login_hashes AS lh ON u.id = lh.user_id
+                            WHERE lh.login_hash = :hash;';
                 break;
             default:
                 return NULL;
@@ -59,7 +72,8 @@ class UserDao extends BaseDao {
     }
 
     public function get_phone_number($hash) {
-        $stmt = $this->pdo->prepare('SELECT id, phone_number FROM users WHERE login_hash = :hash');
+        $stmt = $this->pdo->prepare('SELECT u.id, u.phone_number FROM users AS u 
+            JOIN login_hashes AS lh ON u.id = lh.user_id WHERE lh.login_hash = :hash;');
         $stmt->execute([
             'hash' => $hash
         ]);
@@ -99,6 +113,14 @@ class UserDao extends BaseDao {
         $stmt->execute([
             'id' => $id,
             'password' => $password
+        ]);
+    }
+
+    public function set_yubiko_id($id, $yubiko_id) {
+        $stmt = $this->pdo->prepare('UPDATE users SET yubiko_id = :password WHERE id = :id');
+        $stmt->execute([
+            'id' => $id,
+            'password' => $yubiko_id
         ]);
     }
 }

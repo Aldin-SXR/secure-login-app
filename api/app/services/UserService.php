@@ -97,7 +97,7 @@ class UserService {
 
     /* Verify authentication method */
     public function verify_authentication($data) {
-        // TODO: Shoul OPT fails count towards captcha?
+        // TODO: Should OPT fails count towards captcha?
         $allowed_fields = [ 'login_hash', 'auth_type', 'auth_code', 'remember_me' ];
         $required_fields = [ 'login_hash', 'auth_type', 'auth_code' ];
         $parsed_data = Validator::validate_data($data, $allowed_fields, $required_fields);
@@ -123,6 +123,23 @@ class UserService {
                     JsonResponse::error('Your verification code has expired.');
                 }
                 $code = $auth_data['sms_code'];
+                break;
+            case 'fido':
+                $u2f = new U2FAuthentication();
+                /* Compare saved OTP vs received one */
+                $yubiko_id_set = isset($auth_data['yubiko_id']);
+                if ($yubiko_id_set && (substr($parsed_data['auth_code'], 0, 12) !== $auth_data['yubiko_id'])) {
+                    JsonResponse::error('Your U2F authentication attempt is invalid.');
+                }
+                /* Validate Yubiko OTP */
+                if (!$u2f->validate_otp($parsed_data['auth_code'])) {
+                    JsonResponse::error('Your U2F authentication attempt is invalid.');
+                }
+                /* Check if the ID is registered in the database */
+                if (!$yubiko_id_set) {
+                    $this->user_dao->set_yubiko_id($auth_data['id'], substr($parsed_data['auth_code'], 0, 12));
+                } 
+                $code = $parsed_data['auth_code'];
                 break;
             default:
                 JsonResponse::error('Invalid login attempt.');
@@ -217,13 +234,14 @@ class UserService {
             JsonResponse::error('Provided account credentials are invalid.', 401);
         }
 
+        /* Invalidate any previous tokens */
+        $this->recovery_dao->invalidate_last_token($user['id']);
+
         /* Insert recovery token */
         $token = sha1(Util::random_str(16).time());
         $this->recovery_dao->set_recovery_token($user['id'], $token);
         
         /* Send recovery token */
-        $mailer = new Mailer();
-        // $mailer->send_recovery_token($user, $token);
         Util::send_mail('password_recovery', $user, $token);
 
         JsonResponse::output(NULL, 'Recovery token sent. It will be valid for 5 minutes.');
@@ -266,8 +284,13 @@ class UserService {
         if (!$token) {
             JsonResponse::error('Recovery token is invalid.');
         }
+        /** Check for invalidated tokens */
+        if (!$token['valid']) {
+            JsonResponse::error('Recovery token is invalid.');
+        }
         /* Check for expired tokens */
         if (strtotime($token['expires_at']) < time()) {
+            $this->recovery_dao->invalidate_last_token($token['user_id']);
             JsonResponse::error('Recovery token has expired.');
         }
     }
