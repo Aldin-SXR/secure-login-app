@@ -13,6 +13,7 @@ define('LOGIN_EXPIRY', '+45 seconds');
 define('SMS_EXPIRY', '+30 seconds');
 define('REMEMBER_ME_EXPIRY', '+2 minutes');
 define('RECOVERY_TOKEN_EXPIRY', '+5 minutes');
+define('FRONTEND_CLIENT', '');
 
 /** Database config */
 define('DB_HOST', '');
@@ -26,3 +27,7 @@ define('SMTP_SERVER', '');
 define('SMTP_PORT', 587);
 define('SMTP_USER', '');
 define('SMTP_PASS', '');
+
+/** YubiKey configuration */
+define('YUBIKEY_CLIENT_ID', 0);
+define('YUBIKEY_SECRET', '');

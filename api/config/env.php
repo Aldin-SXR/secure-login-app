@@ -6,6 +6,7 @@ define('HIBP_URL', $_ENV['HIBP_URL']);
 define('SITE_KEY', $_ENV['SITE_KEY']);
 define('CAPTCHA_SECRET', $_ENV['CAPTCHA_SECRET']);
 define('JWT_SECRET', $_ENV['JWT_SECRET']);
+define('FRONTEND_CLIENT', $_ENV['FRONTEND_CLIENT']);
 
 /** Durations config */
 define('JWT_EXPIRY', $_ENV['JWT_EXPIRY']);
@@ -26,3 +27,7 @@ define('SMTP_SERVER', $_ENV['SMTP_SERVER']);
 define('SMTP_PORT', $_ENV['SMTP_PORT']);
 define('SMTP_USER', $_ENV['SMTP_USER']);
 define('SMTP_PASS', $_ENV['SMTP_PASS']);
+
+/** YubiKey configuration */
+define('YUBIKEY_CLIENT_ID', $_ENV['YUBIKEY_CLIENT_ID']);
+define('YUBIKEY_SECRET', $_ENV['YUBIKEY_SECRET']);
