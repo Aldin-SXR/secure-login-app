@@ -22,12 +22,14 @@ class UserDao extends BaseDao {
     }
 
     public function set_login_hash($id, $hash, $expiry) {
-        $stmt = $this->pdo->prepare('INSERT INTO login_hashes (login_hash, login_hash_expiry, user_id) 
-            VALUES (:login_hash, :login_hash_expiry, :user_id);');
+        $stmt = $this->pdo->prepare('INSERT INTO login_hashes (login_hash, issued_at, login_hash_expiry, user_id, valid) 
+            VALUES (:login_hash, :issued_at, :login_hash_expiry, :user_id, :valid);');
         $stmt->execute([
             'user_id' => $id,
             'login_hash' => $hash,
-            'login_hash_expiry' => $expiry
+            'issued_at' => date('Y-m-d H:i:s'),
+            'login_hash_expiry' => $expiry,
+            'valid' => 1
         ]);
     }
 
@@ -47,18 +49,18 @@ class UserDao extends BaseDao {
             case 'otp':
                 $sql ='SELECT u.id, u.email_address, lh.login_hash, lh.login_hash_expiry, u.otp_secret FROM users AS u
                             JOIN login_hashes AS lh ON u.id = lh.user_id
-                            WHERE lh.login_hash = :hash;';
+                            WHERE lh.login_hash = :hash AND lh.valid = 1;';
                 break;
             case 'sms':
                 $sql ='SELECT u.id, u.email_address, lh.login_hash, lh.login_hash_expiry, vc.sms_code, vc.sms_code_expiry FROM users AS u
                             JOIN login_hashes AS lh ON u.id = lh.user_id
                             JOIN validation_codes AS vc on u.id = vc.user_id
-                            WHERE lh.login_hash = :hash;';
+                            WHERE lh.login_hash = :hash AND lh.valid = 1;';
                 break;
             case 'fido':
                 $sql ='SELECT u.id, u.email_address, lh.login_hash, lh.login_hash_expiry, u.yubiko_id FROM users AS u 
                             JOIN login_hashes AS lh ON u.id = lh.user_id
-                            WHERE lh.login_hash = :hash;';
+                            WHERE lh.login_hash = :hash AND lh.valid = 1;';
                 break;
             default:
                 return NULL;
@@ -73,7 +75,7 @@ class UserDao extends BaseDao {
 
     public function get_phone_number($hash) {
         $stmt = $this->pdo->prepare('SELECT u.id, u.phone_number FROM users AS u 
-            JOIN login_hashes AS lh ON u.id = lh.user_id WHERE lh.login_hash = :hash;');
+            JOIN login_hashes AS lh ON u.id = lh.user_id WHERE lh.login_hash = :hash AND lh.valid = 1;');
         $stmt->execute([
             'hash' => $hash
         ]);
@@ -121,6 +123,14 @@ class UserDao extends BaseDao {
         $stmt->execute([
             'id' => $id,
             'password' => $yubiko_id
+        ]);
+    }
+
+    public function invalidate_last_login_hash($id) {
+        $stmt = $this->pdo->prepare('UPDATE login_hashes SET valid = 0 WHERE user_id = :user_id
+            ORDER BY issued_at DESC LIMIT 1;');
+        $stmt->execute([
+           'user_id' => $id 
         ]);
     }
 }

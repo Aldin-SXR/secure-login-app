@@ -60,6 +60,9 @@ class UserService {
             $this->output_jwt($user);
         }
 
+        /* Invalidate a previous login hash */
+        $this->user_dao->invalidate_last_login_hash($user['id']);
+
         /* Generate temporary login hash */
         $login_hash = sha1(Util::random_str(16));
         $expiry = strtotime(LOGIN_EXPIRY);
@@ -80,6 +83,10 @@ class UserService {
 
         /* Send an SMS with the authentication code */
         $auth_data = $this->user_dao->get_phone_number($parsed_data['login_hash']);
+        if (!$auth_data) {
+            JsonResponse::error('Invalid verification attempt.');
+        }
+
         $code = Util::random_str(6, '0123456789');
         $expiry = strtotime(SMS_EXPIRY);
         SendSms::send_message(
