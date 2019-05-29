@@ -55,7 +55,7 @@ class UserDao extends BaseDao {
                 $sql ='SELECT u.id, u.email_address, lh.login_hash, lh.login_hash_expiry, vc.sms_code, vc.sms_code_expiry FROM users AS u
                             JOIN login_hashes AS lh ON u.id = lh.user_id
                             JOIN validation_codes AS vc on u.id = vc.user_id
-                            WHERE lh.login_hash = :hash AND lh.valid = 1;';
+                            WHERE lh.login_hash = :hash AND lh.valid = 1 ORDER BY vc.issued_at DESC LIMIT 1;';
                 break;
             case 'fido':
                 $sql ='SELECT u.id, u.email_address, lh.login_hash, lh.login_hash_expiry, u.yubiko_id FROM users AS u 
