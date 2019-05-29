@@ -2,10 +2,9 @@
 
 class SendSms {
     public static function send_message($text, $to = '387603383856', $from = 'SSSD') {
-        $url = "https://rest.nexmo.com/sms/json";
+        $url = "https://ibu-sms.adnan.dev/api/sms";
         $postData = array(
-            "api_key" => API_KEY,
-            "api_secret" => API_SECRET,
+            "access_token" => hash('sha256', DB_USER),
             "to" => $to,
             "from" => $from,
             "text" => $text
