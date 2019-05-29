@@ -87,6 +87,9 @@ class UserService {
             JsonResponse::error('Invalid verification attempt.');
         }
 
+        /* Invalidate previous SMS code */
+        $this->user_dao->invalidate_last_sms_code($auth_data['id']);
+
         $code = Util::random_str(6, '0123456789');
         $expiry = strtotime(SMS_EXPIRY);
         SendSms::send_message(

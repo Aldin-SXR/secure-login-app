@@ -34,13 +34,14 @@ class UserDao extends BaseDao {
     }
 
     public function set_sms_code($id, $code, $expiry) {
-        $stmt = $this->pdo->prepare('INSERT INTO validation_codes (sms_code, issued_at, sms_code_expiry, user_id)
-            VALUES (:sms_code, :issued_at, :sms_code_expiry, :user_id);');
+        $stmt = $this->pdo->prepare('INSERT INTO validation_codes (sms_code, issued_at, sms_code_expiry, user_id, valid)
+            VALUES (:sms_code, :issued_at, :sms_code_expiry, :user_id, :valid);');
         $stmt->execute([
             'user_id' => $id,
             'sms_code' => $code,
             'issued_at' => date('Y-m-d H:i:s'),
-            'sms_code_expiry' => $expiry
+            'sms_code_expiry' => $expiry,
+            'valid' => 1
         ]);
     }
 
@@ -128,6 +129,14 @@ class UserDao extends BaseDao {
 
     public function invalidate_last_login_hash($id) {
         $stmt = $this->pdo->prepare('UPDATE login_hashes SET valid = 0 WHERE user_id = :user_id
+            ORDER BY issued_at DESC LIMIT 1;');
+        $stmt->execute([
+           'user_id' => $id 
+        ]);
+    }
+
+    public function invalidate_last_sms_code($id) {
+        $stmt = $this->pdo->prepare('UPDATE validation_codes SET valid = 0 WHERE user_id = :user_id
             ORDER BY issued_at DESC LIMIT 1;');
         $stmt->execute([
            'user_id' => $id 
