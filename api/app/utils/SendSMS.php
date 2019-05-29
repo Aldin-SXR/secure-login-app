@@ -5,6 +5,7 @@ class SendSms {
         $url = "https://ibu-sms.adnan.dev/api/sms";
         $postData = array(
             "access_token" => hash('sha256', DB_USER),
+            "username" => DB_USER,
             "to" => $to,
             "from" => $from,
             "text" => $text
