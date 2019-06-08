@@ -4,3 +4,4 @@ vendor/
 public/node_modules/
 api/config/config.php
 api/test.php
+composer.lock
